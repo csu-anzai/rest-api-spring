@@ -1,9 +1,9 @@
 package net.openu.demorestapi.events;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.net.URI;
+import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,13 +17,17 @@ public class EventController {
 
   private final EventRepository eventRepository;
 
-  public EventController(EventRepository eventRepository) {
+  private final ModelMapper modelMapper;
+
+  public EventController(EventRepository eventRepository, ModelMapper modelMapper) {
     this.eventRepository = eventRepository;
+    this.modelMapper = modelMapper;
   }
 
   //  @PostMapping("/api/events")
   @PostMapping
-  public ResponseEntity createEvents(@RequestBody Event event){
+  public ResponseEntity createEvents(@RequestBody EventDto eventDto){
+    Event event = modelMapper.map(eventDto, Event.class);
     Event newEvent = this.eventRepository.save(event);
     URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
 //    URI createdUri = linkTo(methodOn(EventController.class).createEvents(null)).slash("{id}").toUri();
